@@ -45,19 +45,11 @@ public class Minesweeper {
                 System.out.println("Invalid choice. Please enter a number.");
             }
         }
-        int difficulty;
-        switch (choice) {
-            case 2:
-                difficulty = 14;
-                break;
-            case 3:
-                difficulty = 20;
-                break;
-            default:
-                difficulty = 8;
-                break;
-        }
-        return difficulty;
+        return switch (choice) {
+            case 2 -> 14;
+            case 3 -> 20;
+            default -> 8;
+        };
     }
 
     public void setupBombs(int numBombs) {
