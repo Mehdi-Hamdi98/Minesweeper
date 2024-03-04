@@ -210,14 +210,14 @@ public class Minesweeper {
             if(j!=0)
             {
                 visibleBoard[i-1][j-1] = hiddenBoard[i-1][j-1];
-                if(visibleBoard[i-1][j-1]==0) visibleBoard[i-1][j-1]=50;
+                if(visibleBoard[i-1][j-1]==0) visibleBoard[i-1][j-1] = 50;
 
             }
         }
         if(i!=7)
         {
             visibleBoard[i+1][j]=hiddenBoard[i+1][j];
-            if(visibleBoard[i+1][j]==0) visibleBoard[i+1][j]=50;
+            if(visibleBoard[i+1][j]==0) visibleBoard[i+1][j] = 50;
             if(j!=7)
             {
                 visibleBoard[i+1][j+1]= hiddenBoard[i+1][j+1];
