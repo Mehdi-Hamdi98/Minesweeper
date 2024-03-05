@@ -2,14 +2,14 @@ package org.example;
 import java.util.*;
 
 public class Minesweeper {
-    private final int[][] visibleBoard = new int[8][8];
-    private final int[][] hiddenBoard = new int[8][8];
+    public final int[][] visibleBoard = new int[8][8];
+    public final int[][] hiddenBoard = new int[8][8];
 
     public static void main(String[] args) {
         Minesweeper minesweeper = new Minesweeper();
         minesweeper.startGame();
     }
-    public void startGame() {
+    public boolean startGame() {
         System.out.println("|---------------MINESWEEPER GAME!---------------|");
         int difficulty = selectDifficulty();
         setupBombs(difficulty);
@@ -24,6 +24,7 @@ public class Minesweeper {
                 break;
             }
         }
+        return play;
     }
     public int selectDifficulty() {
         Scanner reader = new Scanner(System.in);
