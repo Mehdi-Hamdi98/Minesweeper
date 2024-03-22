@@ -3,9 +3,19 @@ import java.util.*;
 public class Board {
     private final int[][] visibleBoard;
     private final int[][] hiddenBoard;
+    private final boolean[][] flaggedCells;
+    private final boolean[][] visited;
+    public static final int UNDISCOVERED = 0;
+    public static final int BOMB = 64;
+    public static final int FLAGGED_CELL = 70;
+    public static final int EMPTY_CELL = 50;
+    public static final int BOARD_SIZE = 8;
+
     public Board() {
-        visibleBoard = new int[8][8];
-        hiddenBoard = new int[8][8];
+        visibleBoard = new int[BOARD_SIZE][BOARD_SIZE];
+        hiddenBoard = new int[BOARD_SIZE][BOARD_SIZE];
+        flaggedCells = new boolean[BOARD_SIZE][BOARD_SIZE];
+        visited = new boolean[BOARD_SIZE][BOARD_SIZE];
     }
     public int[][] getHiddenBoard() {
         return hiddenBoard;
@@ -13,89 +23,73 @@ public class Board {
     public int[][] getVisibleBoard() {
         return visibleBoard;
     }
-
-    //places selected number of bombs randomly in the board
+    // Places selected number of bombs randomly on the board
     public void setupBombs(int numBombs) {
-        int var = 0;
-        while (var != numBombs) {
+        int bombsPlaced = 0;
+        while (bombsPlaced != numBombs) {
             Random random = new Random();
-            int i = random.nextInt(8);
-            int j = random.nextInt(8);
+            int i = random.nextInt(BOARD_SIZE);
+            int j = random.nextInt(BOARD_SIZE);
 
-            if (hiddenBoard[i][j] != 64) {
-                hiddenBoard[i][j] = 64;
-                var++;
+            if (hiddenBoard[i][j] != BOMB) {
+                hiddenBoard[i][j] = BOMB;
+                bombsPlaced++;
             }
         }
         buildHidden();
     }
-    //populates the hidden board with the number of adjacent bombs for each cell that is not a bomb itself
+    // Populates the hidden board with the number of adjacent bombs for each cell that is not a bomb itself
     public void buildHidden() {
-        for(int i=0; i<8; i++)
-        {
-            for(int j=0; j<8; j++)
-            {
-                int count=0;
-                if(hiddenBoard[i][j]!=64)
-                {
-
-                    if(i!=0)
-                    {
-                        if(hiddenBoard[i-1][j]==64) count++;
-                        if(j!=0)
-                        {
-                            if(hiddenBoard[i-1][j-1]==64) count++;
-                        }
-
-                    }
-                    if(i!=7)
-                    {
-                        if(hiddenBoard[i+1][j]==64) count++;
-                        if(j!=7)
-                        {
-                            if(hiddenBoard[i+1][j+1]==64) count++;
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                int count = 0;
+                if (hiddenBoard[i][j] != BOMB) {
+                    if (i != 0) {
+                        if (hiddenBoard[i - 1][j] == BOMB) count++;
+                        if (j != 0) {
+                            if (hiddenBoard[i - 1][j - 1] == BOMB) count++;
                         }
                     }
-                    if(j!=0)
-                    {
-                        if(hiddenBoard[i][j-1]==64) count++;
-                        if(i!=7)
-                        {
-                            if(hiddenBoard[i+1][j-1]==64) count++;
+                    if (i != 7) {
+                        if (hiddenBoard[i + 1][j] == BOMB) count++;
+                        if (j != 7) {
+                            if (hiddenBoard[i + 1][j + 1] == BOMB) count++;
                         }
                     }
-                    if(j!=7)
-                    {
-                        if(hiddenBoard[i][j+1]==64) count++;
-                        if(i!=0)
-                        {
-                            if(hiddenBoard[i-1][j+1]==64) count++;
+                    if (j != 0) {
+                        if (hiddenBoard[i][j - 1] == BOMB) count++;
+                        if (i != 7) {
+                            if (hiddenBoard[i + 1][j - 1] == BOMB) count++;
                         }
                     }
-
+                    if (j != 7) {
+                        if (hiddenBoard[i][j + 1] == BOMB) count++;
+                        if (i != 0) {
+                            if (hiddenBoard[i - 1][j + 1] == BOMB) count++;
+                        }
+                    }
                     hiddenBoard[i][j] = count;
                 }
             }
         }
-
     }
-    //Displays the board in the CLI
+    // Displays the board in the CLI
     public void displayVisible() {
         System.out.print("\t ");
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print(" " + i + "  ");
         }
         System.out.print("\n");
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print(i + "\t| ");
-            for (int j = 0; j < 8; j++) {
-                if (visibleBoard[i][j] == 0) { //Check if it's an undiscovered cell
-                    System.out.print("?");
-                } else if (visibleBoard[i][j] == 50) { //Check if it's an empty cell
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (visibleBoard[i][j] == UNDISCOVERED) { // Check if it's an undiscovered cell
+                    System.out.print("-");
+                } else if (visibleBoard[i][j] == EMPTY_CELL) { // Check if it's an empty cell
                     System.out.print(" ");
-                } else if (visibleBoard[i][j] == 70) { //Check if it's a flagged cell
+                } else if (visibleBoard[i][j] == FLAGGED_CELL) { // Check if it's a flagged cell
                     System.out.print("F");
-                } else if (hiddenBoard[i][j] == 64) { // Check if it's a bomb cell
+                } else if (hiddenBoard[i][j] == BOMB) { // Check if it's a bomb cell
                     System.out.print("?"); // Hide bomb cells
                 } else {
                     System.out.print(visibleBoard[i][j]);
@@ -105,109 +99,62 @@ public class Board {
             System.out.print("\n");
         }
     }
-    //Updates the visible board after a player chooses to reveal a cell
-    public void updateVisible(int i, int j) {
-        if (hiddenBoard[i][j] != 64) { // Check if the cell is not a bomb
-            visibleBoard[i][j] = 50;
-            if (i != 0) {
-                visibleBoard[i - 1][j] = hiddenBoard[i - 1][j];
-                if (visibleBoard[i - 1][j] == 0) visibleBoard[i - 1][j] = 50;
-                if (j != 0) {
-                    visibleBoard[i - 1][j - 1] = hiddenBoard[i - 1][j - 1];
-                    if (visibleBoard[i - 1][j - 1] == 0) visibleBoard[i - 1][j - 1] = 50;
-                }
-            }
-            if (i != 7) {
-                visibleBoard[i + 1][j] = hiddenBoard[i + 1][j];
-                if (visibleBoard[i + 1][j] == 0) visibleBoard[i + 1][j] = 50;
-                if (j != 7) {
-                    visibleBoard[i + 1][j + 1] = hiddenBoard[i + 1][j + 1];
-                    if (visibleBoard[i + 1][j + 1] == 0) visibleBoard[i + 1][j + 1] = 50;
-                }
-            }
-            if (j != 0) {
-                visibleBoard[i][j - 1] = hiddenBoard[i][j - 1];
-                if (visibleBoard[i][j - 1] == 0) visibleBoard[i][j - 1] = 50;
-                if (i != 7) {
-                    visibleBoard[i + 1][j - 1] = hiddenBoard[i + 1][j - 1];
-                    if (visibleBoard[i + 1][j - 1] == 0) visibleBoard[i + 1][j - 1] = 50;
-                }
-            }
-            if (j != 7) {
-                visibleBoard[i][j + 1] = hiddenBoard[i][j + 1];
-                if (visibleBoard[i][j + 1] == 0) visibleBoard[i][j + 1] = 50;
-                if (i != 0) {
-                    visibleBoard[i - 1][j + 1] = hiddenBoard[i - 1][j + 1];
-                    if (visibleBoard[i - 1][j + 1] == 0) visibleBoard[i - 1][j + 1] = 50;
-                }
-            }
+    // Updates the visible board after a player chooses to reveal a cell
+    public void revealCell(int i, int j) {
+        if (!isValidCell(i, j) || flaggedCells[i][j] || visited[i][j]) {
+            return; // Exit if cell is out of bounds, flagged, or already visited
         }
-    }
-    //reveals adjacent cells recursively
-    public void updateNeighbours(int i, int j) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                int neighbourX = i + x;
-                int neighbourY = j + y;
+        visited[i][j] = true; // Mark the current cell as visited
 
-                // Skip the current cell itself
-                if (x == 0 && y == 0) continue;
-                // Check if the neighbour is within bounds
-                if (neighbourX >= 0 && neighbourX < 8 && neighbourY >= 0 && neighbourY < 8) {
-                    // Skip revealing bombs
-                    if (hiddenBoard[neighbourX][neighbourY] == 64) continue;
-                    // Update the neighbour if it's not already revealed
-                    if (visibleBoard[neighbourX][neighbourY] == 0) {
-                        updateVisible(neighbourX, neighbourY);
-                    }
+        if (hiddenBoard[i][j] == UNDISCOVERED) {
+            visibleBoard[i][j] = EMPTY_CELL; //
+
+            // Recursively reveal neighbouring empty cells
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    revealCell(i + x, j + y);
                 }
             }
+        } else {
+            visibleBoard[i][j] = hiddenBoard[i][j]; // Reveal current cell
         }
     }
-    //checks if every cell revealed isn't a bomb
+    // Checks if every cell revealed isn't a bomb
     public boolean checkWin() {
-        for(int i=0; i<8; i++)
-        {
-            for(int j=0; j<8; j++)
-            {
-                if(visibleBoard[i][j]==0)
-                {
-                    if(hiddenBoard[i][j]!=64)
-                    {
-                        return false;
-                    }
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (visibleBoard[i][j] == UNDISCOVERED && hiddenBoard[i][j] != BOMB) {
+                    return false;
                 }
             }
         }
         return true;
     }
     public void displayHidden() {
+        System.out.println("Hidden Board:");
         System.out.print("\t ");
-        for(int i=0; i<8; i++)
-        {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print(" " + i + "  ");
         }
         System.out.print("\n");
-        for(int i=0; i<8; i++)
-        {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             System.out.print(i + "\t| ");
-            for(int j=0; j<8; j++)
-            {
-                if(hiddenBoard[i][j]==0)
-                {
-                    System.out.print(" ");
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (flaggedCells[i][j]) { // If cell is flagged, show 'F'
+                    System.out.print("F | ");
+                } else { // Otherwise, show the content of the cell
+                    if (hiddenBoard[i][j] == BOMB) { // If cell contains a bomb
+                        System.out.print("X | "); // Show bomb
+                    } else {
+                        System.out.print(hiddenBoard[i][j] + " | "); // Show number of adjacent bombs
+                    }
                 }
-                else if(hiddenBoard[i][j]==64)
-                {
-                    System.out.print("X");
-                }
-                else
-                {
-                    System.out.print(hiddenBoard[i][j]);
-                }
-                System.out.print(" | ");
             }
-            System.out.print("\n");
+            System.out.println();
         }
+    }
+    // Helper method to check if a cell is within the bounds of the board
+    private boolean isValidCell(int x, int y) {
+        return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
     }
 }

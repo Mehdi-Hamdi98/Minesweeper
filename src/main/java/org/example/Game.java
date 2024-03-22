@@ -1,9 +1,8 @@
 package org.example;
 import java.util.*;
+import static org.example.Board.BOMB;
 public class Game {
     private final Board board;
-
-
     public Game(Board board) {
         this.board = board;
     }
@@ -23,7 +22,7 @@ public class Game {
             }
         }
     }
-    //Lets user decide difficulty level for the game
+    // Lets user decide difficulty level for the game
     public int selectDifficulty() {
         Scanner reader = new Scanner(System.in);
         System.out.println("Select difficulty level:");
@@ -50,7 +49,7 @@ public class Game {
             default -> 8;
         };
     }
-    //Lets user decide whether to flag or reveal a cell and inputs row and column of cell
+    // Lets user decide whether to flag or reveal a cell and inputs row and column of cell
     public boolean playMove() {
         Scanner reader = new Scanner(System.in);
         System.out.println("\nEnter 'R' to reveal a cell or 'F' to flag a cell: ");
@@ -66,15 +65,12 @@ public class Game {
                 System.out.println("\nIncorrect Input!!");
                 return true;
             }
-
-            if (board.getHiddenBoard()[i][j] == 64) {
+            if (board.getHiddenBoard()[i][j] == BOMB) {
                 board.displayHidden();
                 System.out.print("Oh no! You selected a mine!\n============GAME OVER============");
                 return false;
-            } else if (board.getHiddenBoard()[i][j] == 0) {
-                board.updateVisible(i, j);
             } else {
-                board.updateNeighbours(i, j);
+                board.revealCell(i, j);
             }
         } else if (choice.equals("F")) {
             System.out.print("\nEnter Row Number: ");
@@ -86,7 +82,6 @@ public class Game {
                 System.out.println("\nIncorrect Input!!");
                 return true;
             }
-
             char FLAGGED_CELL = 'F';
             board.getVisibleBoard()[i][j] = FLAGGED_CELL;
         } else {
@@ -95,5 +90,4 @@ public class Game {
 
         return true;
     }
-
 }
