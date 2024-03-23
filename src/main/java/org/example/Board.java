@@ -50,19 +50,19 @@ public class Board {
                             if (hiddenBoard[i - 1][j - 1] == BOMB) count++;
                         }
                     }
-                    if (i != 7) {
+                    if (i != (BOARD_SIZE - 1)) {
                         if (hiddenBoard[i + 1][j] == BOMB) count++;
-                        if (j != 7) {
+                        if (j != (BOARD_SIZE - 1)) {
                             if (hiddenBoard[i + 1][j + 1] == BOMB) count++;
                         }
                     }
                     if (j != 0) {
                         if (hiddenBoard[i][j - 1] == BOMB) count++;
-                        if (i != 7) {
+                        if (i != (BOARD_SIZE - 1)) {
                             if (hiddenBoard[i + 1][j - 1] == BOMB) count++;
                         }
                     }
-                    if (j != 7) {
+                    if (j != (BOARD_SIZE - 1)) {
                         if (hiddenBoard[i][j + 1] == BOMB) count++;
                         if (i != 0) {
                             if (hiddenBoard[i - 1][j + 1] == BOMB) count++;

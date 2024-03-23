@@ -1,5 +1,7 @@
 package org.example;
 import java.util.*;
+
+import static org.example.Board.BOARD_SIZE;
 import static org.example.Board.BOMB;
 public class Game {
     private final Board board;
@@ -61,7 +63,7 @@ public class Game {
             System.out.print("Enter Column Number: ");
             int j = InputValidator.readIntegerInput(reader);
 
-            if (i < 0 || i > 7 || j < 0 || j > 7) {
+            if (i < 0 || i > (BOARD_SIZE - 1) || j < 0 || j > (BOARD_SIZE - 1)) {
                 System.out.println("\nIncorrect Input!!");
                 return true;
             }
@@ -78,7 +80,7 @@ public class Game {
             System.out.print("Enter Column Number: ");
             int j = InputValidator.readIntegerInput(reader);
 
-            if (i < 0 || i > 7 || j < 0 || j > 7) {
+            if (i < 0 || i > (BOARD_SIZE - 1) || j < 0 || j > (BOARD_SIZE - 1)) {
                 System.out.println("\nIncorrect Input!!");
                 return true;
             }
